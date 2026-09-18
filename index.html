@@ -250,6 +250,33 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
+/* ============================================================
+   MODO APP (index.html?full=1 ou app.html)
+   A tela do protótipo ocupa o aparelho inteiro: sem casca, sem
+   moldura e sem barra lateral. Serve para abrir no celular e
+   gravar a tela como se fosse o app publicado.
+   ============================================================ */
+body.full{padding:0;gap:0;display:block;background:var(--surface-page);min-height:100dvh}
+body.full .rail, body.full .hint{display:none}
+body.full .stage{gap:0}
+body.full .device{padding:0;border-radius:0;background:none;box-shadow:none}
+body.full .device::before, body.full .device::after{display:none}
+body.full .phone{width:100vw;height:100dvh;border-radius:0;box-shadow:none}
+body.full .phone::after{display:none}
+body.full .status-inset{height:calc(var(--sp-6) + env(safe-area-inset-top, 0px))}
+body.full .nav{padding-bottom:calc(var(--sp-6) + env(safe-area-inset-bottom, 0px))}
+body.full .view{padding-bottom:var(--sp-6)}
+/* área invisível de serviço: um toque aqui abre o seletor de perfil e telas,
+   sem deixar nenhum botão visível na gravação */
+body.full .devzone{position:fixed;left:0;top:0;width:3rem;height:3rem;z-index:40;
+  background:transparent;border:0;padding:0}
+.devsheet{position:fixed;inset:0;z-index:50;background:var(--overlay-scrim);
+  display:flex;align-items:flex-end}
+.devsheet .inner{width:100%;max-height:80dvh;overflow-y:auto;background:var(--surface-card);
+  border-radius:var(--radius-card) var(--radius-card) 0 0;padding:var(--sp-8);
+  display:flex;flex-direction:column;gap:var(--sp-6)}
+.devsheet .grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3)}
+
 body{
   margin:0;padding:var(--sp-16);
   background:var(--shell-bg);color:var(--shell-fg);
@@ -301,6 +328,16 @@ svg{flex:none}
 .log li b{color:var(--shell-fg);font-weight:var(--weight-semibold)}
 /* .empty traz padding de 40px para o estado vazio de tela cheia; na coluna isso vira vão solto */
 .log .empty{font-size:var(--text-body-sm-size);color:var(--shell-fg);padding:0;text-align:left}
+/* atalho para a versão de tela cheia (app.html), na casca do protótipo */
+.mobile-link{display:flex;gap:var(--sp-4);align-items:flex-start;margin:var(--sp-8) 0 var(--sp-10);
+  padding:var(--sp-5) var(--sp-6);border-radius:var(--radius-card);
+  background:var(--white-alpha-12);border:1px solid var(--white-alpha-24);
+  color:var(--shell-fg);text-decoration:none}
+.mobile-link:hover{background:var(--white-alpha-24)}
+.mobile-link .ml-ic{flex:none;margin-top:2px}
+.mobile-link .ml-txt{display:flex;flex-direction:column;gap:var(--sp-1)}
+.mobile-link b{font-family:var(--font-display);font-size:var(--text-body-sm-size);font-weight:var(--weight-semibold)}
+.mobile-link small{font-size:var(--text-micro-size);line-height:var(--leading-normal);opacity:.78}
 .reset{margin-top:var(--sp-8);font-size:var(--text-body-sm-size);color:var(--shell-fg);text-decoration:underline}
 
 /* o anel de foco azul some sobre o azul — na casca ele é branco */
@@ -430,6 +467,18 @@ svg{flex:none}
 .avatar{border-radius:var(--radius-pill);flex:none;display:grid;place-items:center;
   font-family:var(--font-display);font-weight:var(--weight-semibold);letter-spacing:.02em}
 .thumb{border-radius:var(--radius-media);background:var(--grey-100);display:grid;place-items:center;color:var(--icon-muted);flex:none}
+/* palco do feed: o player e os dois vizinhos vivem aqui dentro, e é este
+   bloco que recorta a transição vertical no estilo dos feeds de vídeo */
+.pstage{flex:1 1 auto;min-height:20rem;position:relative;overflow:hidden;
+  border-radius:var(--radius-panel);background:var(--surface-panel-ink);touch-action:pan-x}
+.pstage .player{position:absolute;inset:0;flex:none;min-height:0;border-radius:0;will-change:transform}
+.pstage .peek{position:absolute;inset:0;z-index:1;background:#000 center/cover no-repeat;
+  border-radius:0;will-change:transform}
+.pstage .peek.up{transform:translateY(-100%)}
+.pstage .peek.down{transform:translateY(100%)}
+.pstage .peek::after{content:"";position:absolute;inset:0;background:var(--ink-900);opacity:.25}
+.pstage.glide .player, .pstage.glide .peek{transition:transform var(--duration-normal) cubic-bezier(.22,.61,.36,1)}
+@media (prefers-reduced-motion:reduce){.pstage.glide .player,.pstage.glide .peek{transition:none}}
 .player{flex:1 1 auto;min-height:20rem;border-radius:var(--radius-panel);
   background:radial-gradient(120% 80% at 50% 28%,var(--ink-700) 0%,rgba(38,38,47,0) 62%),var(--surface-panel-ink);
   color:var(--text-inverted);position:relative;overflow:hidden}
@@ -565,6 +614,10 @@ svg{flex:none}
 <aside class="rail">
   <div class="mark"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="302 268 1198 356" xmlns:c2pa="http://c2pa.org/manifest"><path fill="#0E0E12" d="M367.917 277.486C383.976 275.675 400.368 285.174 413.544 293.117C441.199 309.788 468.398 327.191 495.911 344.092L539.428 370.595C562.354 384.472 587.252 396.027 595.274 423.619C599.836 439.235 598 456.024 590.172 470.285C577.946 492.408 554.979 501.93 534.423 514.514C518.918 524.006 503.304 533.244 487.721 542.594L433.062 575.999C399.587 596.491 378.36 616.264 339.592 594.443C310.351 572.543 315.559 544.867 315.365 512.261C315.275 497.062 315.239 481.845 316.043 466.666C363.496 443.139 409.519 415.875 456.959 392.197C475.59 382.898 467.058 361.026 449.294 363.983C439.159 366.82 429.801 373.46 420.547 377.978C388.422 393.696 356.954 415.243 323.551 427.462C311.893 431.727 315.388 387.212 315.615 381.13C316.318 362.272 313.465 338.857 317.365 320.729C323.047 294.317 342.237 280.84 367.917 277.486ZM347.682 515.435C358.964 510.643 371.636 503.399 382.638 497.48L436.332 468.641L478.058 446.536C486.123 442.312 507.218 433.45 510.358 424.722C514.369 413.573 504.234 405.889 493.267 405.411C481.833 410.449 470.094 417.18 458.986 423.129L405.872 451.547L364.97 473.425C355.071 478.7 334.181 487.628 330.148 497.64C325.71 508.654 338.304 515.264 347.682 515.435ZM359.239 573.045C387.078 559.777 414.647 543.366 442.189 529.255C463.3 518.438 484.743 507.074 505.032 494.862C517.771 486.552 510.135 467.616 491.651 469.552C458.398 486.705 425.362 504.277 392.552 522.265C378.02 530.142 360.915 538.802 347.011 547.424C334.019 555.48 339.606 575.013 359.239 573.045Z"></path><path fill="#0E0E12" d="M647.017 356.233L647.866 356.199C658.633 355.787 671.024 356.03 681.903 355.99C710.818 355.885 739.505 355.149 762.006 376.083C776.141 389.292 784.389 407.616 784.905 426.955C785.673 448.879 778.842 467.209 763.979 483.184C742.365 504.656 714.569 504.308 686.352 504.279L646.891 504.179C646.208 484.271 646.8 465.699 646.862 445.881L647.017 356.233ZM687.107 467.562C703.363 467.694 719.74 469.262 732.786 457.515C746.757 440.455 748.189 415.903 730.457 400.432C718.926 390.372 701.514 392.293 687.073 392.253C687.078 417.21 686.816 442.647 687.107 467.562Z"></path><path fill="#0E0E12" d="M1111.59 356.341C1126.17 356.264 1140.74 356.31 1155.32 356.479C1175.47 405.244 1194.39 454.507 1212.06 504.221L1167.21 504.217C1164.65 496.391 1162.96 487.327 1159.09 479.939C1158.17 478.178 1158.05 478.6 1155.74 477.985C1139.71 477.654 1122.91 477.891 1106.82 477.876C1104.37 486.139 1100.83 495.718 1098.14 504.147L1053.76 504.12L1086.95 418.908C1094.78 398.515 1102.78 376.129 1111.59 356.341ZM1116.94 445.962L1132.79 445.95L1148.93 445.928C1146.26 437.647 1136.31 404.559 1132.29 398.986C1127.45 415.067 1122.05 430.122 1116.94 445.962Z"></path><path fill="#0E0E12" d="M1417.72 389.258C1430.52 387.62 1441.67 392.892 1451.81 399.844C1454.73 392.185 1454.94 392.184 1463.43 392.159C1472.76 392.131 1482.12 392.294 1491.45 392.389L1491.55 504.196L1456.88 504.193C1455.59 501.443 1454.5 498.268 1452.05 496.669C1448.8 496.723 1449.58 496.879 1446.47 499.057C1412.26 522.77 1368.98 494.576 1364.73 454.797C1362.83 438.474 1367.55 422.07 1377.83 409.253C1388.38 396.201 1401.46 391.024 1417.72 389.258ZM1431.24 474.132C1445.5 472.203 1455.51 459.086 1453.61 444.817C1451.7 430.548 1438.6 420.516 1424.33 422.397C1410.02 424.283 1399.96 437.421 1401.87 451.724C1403.78 466.028 1416.94 476.066 1431.24 474.132Z"></path><path fill="#0E0E12" d="M843.319 389.208C845.498 388.942 847.692 388.819 849.887 388.839C879.596 389.324 902.176 406.991 907.755 436.863C909.145 444.305 908.827 450.204 908.619 457.81L826.619 457.953C833.595 480.391 855.406 484.23 870.305 466.072C882.491 466.206 894.298 466.267 906.464 467.048C893.95 506.654 843.72 520.03 811.867 496.156C799.221 486.779 790.858 472.727 788.645 457.141C783.479 420.11 807.441 393.954 843.319 389.208ZM826.689 435.018C835.459 435.149 844.23 435.188 853.001 435.135L871.593 435.03C864.805 421.901 860.413 417.934 844.906 418.574C835.855 421.454 832.608 423.347 828.067 432.161C827.582 433.101 827.122 434.053 826.689 435.018Z"></path><path fill="#0E0E12" d="M913.096 392.305L950.376 392.298C950.012 404.299 949.852 416.946 949.961 429.04C950.091 443.471 946.619 473.593 967.552 474.039C983.476 474.379 985.982 459.972 985.858 447.199C985.682 428.96 985.688 410.643 985.651 392.382L1023.55 392.461L1023.68 425.743C1023.96 446.907 1027.1 475.876 1010.65 492.185C989.701 512.952 946.58 512.922 925.771 491.976C921.097 487.316 917.64 481.58 915.703 475.271C911.004 459.868 912.967 410.427 913.096 392.305Z"></path><path fill="#0E0E12" d="M1204.14 392.309L1242 392.333C1240.41 405.672 1242.07 421.5 1241.55 435.095C1241.14 445.656 1239.92 461.373 1247.41 469.584C1252.55 475.215 1265.66 475.794 1270.98 469.878C1279.41 460.867 1276.51 444.655 1276.97 433.262C1276.91 419.624 1276.8 405.981 1276.84 392.315L1314.88 392.381L1314.84 422.494L1314.93 446.036C1314.89 462.66 1313.68 480.251 1300.95 492.569C1279.89 512.939 1237.18 512.62 1216.79 491.606C1212.57 487.331 1209.42 482.122 1207.58 476.401C1202.31 459.934 1204.02 411.233 1204.14 392.309Z"></path><path fill="#0E0E12" d="M1321.92 348.763C1334.59 348.878 1347.27 348.878 1359.94 348.763C1359.19 364.6 1359.88 386.684 1359.91 402.917L1359.99 504.07L1321.79 504.133C1320.66 454.684 1321.86 398.675 1321.92 348.763Z"></path></svg></div>
   <p class="sub">Protótipo navegável · HACKTUDO 2026</p>
+  <a class="mobile-link" id="mobile-link" href="app.html" target="_blank" rel="noopener">
+    <span class="ml-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"></rect><path d="M11 18h2"></path></svg></span>
+    <span class="ml-txt"><b>Ver a versão mobile</b><small>Abre o app em tela cheia, sem esta moldura, do jeito que fica no celular</small></span>
+  </a>
   <h2>Entrar como</h2>
   <div class="roles" id="roles"></div>
   <h2>Telas</h2>
@@ -584,6 +637,8 @@ svg{flex:none}
       <div id="toast"></div>
     </div>
   </div>
+  <button class="devzone" id="devzone" aria-label="Abrir navegação do protótipo" onclick="App.a.devSheet(1)"></button>
+  <div id="devsheet"></div>
   <p class="hint" id="hint"></p>
 </main>
 <script>
@@ -1072,6 +1127,7 @@ svg{flex:none}
     if (!l.length) return;
     S.feedIndex = (S.feedIndex + d + l.length) % l.length;
     S.playing = true;
+    S._dir = d;
     render();
   };
   A.togglePlay = function () {
@@ -1554,14 +1610,28 @@ svg{flex:none}
         '<b></b><i id="pbar-fill"></i><u id="pbar-knob"></u></div><em id="pbar-time">0:00 / ' + v.dur + '</em></div>'
       : '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-4);opacity:.55">' +
         ic("play", 40) + '<span style="font-size:var(--size-11)">vídeo · ' + v.dur + '</span></div>';
-    return '<div class="player' + (hasVid ? ' has-video' : '') + '">' + phBg(v.id) + '<div class="scrim' + (PH[v.id] ? ' on-photo' : '') + '"></div>' +
+    var nb = neighbors(v);
+    return '<div class="pstage" id="pstage">' +
+      '<div class="peek up" id="peek-up"' + (nb.up ? ' style="background-image:url(\'' + esc(nb.up) + '\')"' : '') + '></div>' +
+      '<div class="peek down" id="peek-down"' + (nb.down ? ' style="background-image:url(\'' + esc(nb.down) + '\')"' : '') + '></div>' +
+      '<div class="player' + (hasVid ? ' has-video' : '') + '" id="player">' + phBg(v.id) + '<div class="scrim' + (PH[v.id] ? ' on-photo' : '') + '"></div>' +
       vid +
       '<div class="swipe"><button onclick="App.a.step(-1)" aria-label="Anterior">' + ic("back", 15) + '</button>' +
       '<button onclick="App.a.step(1)" aria-label="Próximo" style="transform:rotate(180deg)">' + ic("back", 15) + '</button></div>' +
       '<div class="meta"><div class="meta-tags"><span class="tag g">' + esc(v.disciplina) + '</span>' + (verDestaque(v) ? '<span class="tag a">' + (S.role === "professor" ? "Destaque do professor" : "Seu vídeo em destaque") + '</span>' : '') + '</div>' +
       '<h4>' + esc(v.titulo) + '</h4><p>' + esc(v.autor) + ' · ' + esc(v.turma) + '</p>' +
       (v.legenda ? '<p style="font-size:var(--size-11);opacity:.7;margin-top:var(--sp-2);line-height:var(--leading-normal)">' + esc(String(v.legenda).slice(0, 90)) + (String(v.legenda).length > 90 ? "\u2026" : "") + '</p>' : '') +
-      '</div><div class="rail-actions">' + acts + '</div></div>';
+      '</div><div class="rail-actions">' + acts + '</div></div></div>';
+  }
+  // capa do vídeo anterior e do próximo, para aparecerem na borda durante o arraste
+  function neighbors(v) {
+    var l = visibleFeed(), i, n = l.length, at = -1;
+    for (i = 0; i < n; i++) if (l[i].id === v.id) at = i;
+    if (at < 0 || n < 2) return { up: "", down: "" };
+    return {
+      up: l[(at - 1 + n) % n].poster || "",
+      down: l[(at + 1) % n].poster || ""
+    };
   }
 
   function checkinCard() {
@@ -2109,6 +2179,8 @@ svg{flex:none}
       h += '<li><button aria-current="' + (S.screen === list[i][0]) + '" onclick="App.a.go(\'' + list[i][0] + '\')">' +
         '<span class="n">' + (i + 1) + '</span><span>' + list[i][1] + '</span></button></li>';
     }
+    var ml = document.getElementById("mobile-link");
+    if (ml) ml.href = "app.html?perfil=" + S.role + "&tela=" + S.screen;
     document.getElementById("idx").innerHTML = h;
 
     if (!S.log.length) {
@@ -2152,6 +2224,11 @@ svg{flex:none}
   /* ---------------- vídeo do feed ---------------- */
 
   var VP = null, dragging = false;
+
+  function raf(fn) {
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(fn);
+    else setTimeout(fn, 16);
+  }
 
   function tryPlay() {
     if (!VP) return;
@@ -2231,27 +2308,68 @@ svg{flex:none}
     paintPlay();
     paintProgress();
 
-    var tap = document.getElementById("tapzone"), y0 = 0, t0 = 0, moved = false;
+    var stg = document.getElementById("pstage"), plr = document.getElementById("player");
+    if (stg && plr && S._dir) {
+      var hh = stg.offsetHeight || 520;
+      plr.style.transform = "translateY(" + (S._dir > 0 ? hh : -hh) + "px)";
+      S._dir = 0;
+      // dois quadros de folga para o navegador registrar a posição inicial
+      raf(function () {
+        raf(function () {
+          stg.className = "pstage glide";
+          plr.style.transform = "translateY(0px)";
+          setTimeout(function () { stg.className = "pstage"; }, 260);
+        });
+      });
+    }
+
+    var tap = document.getElementById("tapzone"), y0 = 0, t0 = 0, moved = false, drag = false;
+    var stage = document.getElementById("pstage"), pl = document.getElementById("player");
+    var pu = document.getElementById("peek-up"), pd = document.getElementById("peek-down");
+
+    function put(dy) {
+      var h = stage ? stage.offsetHeight || 520 : 520;
+      if (pl) pl.style.transform = "translateY(" + dy + "px)";
+      if (pu) pu.style.transform = "translateY(" + (dy - h) + "px)";
+      if (pd) pd.style.transform = "translateY(" + (dy + h) + "px)";
+    }
+    function settle(dir) {
+      var h = stage ? stage.offsetHeight || 520 : 520;
+      if (stage) stage.className = "pstage glide";
+      if (dir === 0) { put(0); setTimeout(function () { if (stage) stage.className = "pstage"; }, 240); return; }
+      // o vídeo atual sai e o vizinho ocupa a tela antes de o app trocar de item
+      put(dir > 0 ? -h : h);
+      setTimeout(function () { A.step(dir > 0 ? 1 : -1); }, 220);
+    }
     if (tap) {
       tap.addEventListener("pointerdown", function (e) {
-        y0 = e.clientY; t0 = Date.now(); moved = false;
+        y0 = e.clientY; t0 = Date.now(); moved = false; drag = true;
+        if (stage) stage.className = "pstage";
         tap.setPointerCapture && tap.setPointerCapture(e.pointerId);
       });
       tap.addEventListener("pointermove", function (e) {
-        if (Math.abs(e.clientY - y0) > 12) moved = true;
+        if (!drag) return;
+        var dy = e.clientY - y0;
+        if (Math.abs(dy) > 8) { moved = true; put(dy); }
       });
       tap.addEventListener("pointerup", function (e) {
-        var dy = e.clientY - y0;
-        if (Math.abs(dy) > 60) { A.step(dy > 0 ? 1 : -1); return; }
-        if (!moved && Date.now() - t0 < 400) A.togglePlay();
+        if (!drag) return;
+        drag = false;
+        var dy = e.clientY - y0, dt = Date.now() - t0;
+        var h = stage ? stage.offsetHeight || 520 : 520;
+        var rapido = Math.abs(dy) > 40 && dt < 260;
+        if (moved && (Math.abs(dy) > h * 0.22 || rapido)) { settle(dy < 0 ? 1 : -1); return; }
+        if (moved) { settle(0); return; }
+        if (dt < 400) A.togglePlay();
       });
+      tap.addEventListener("pointercancel", function () { if (drag) { drag = false; settle(0); } });
       tap.addEventListener("wheel", function (e) {
         if (Math.abs(e.deltaY) < 24) return;
         e.preventDefault();
         if (wheelLock) return;
         wheelLock = true;
-        setTimeout(function () { wheelLock = false; }, 420);
-        A.step(e.deltaY > 0 ? 1 : -1);
+        setTimeout(function () { wheelLock = false; }, 520);
+        settle(e.deltaY > 0 ? 1 : -1);
       }, { passive: false });
     }
     var track = document.getElementById("pbar-track");
@@ -2283,11 +2401,49 @@ svg{flex:none}
     mountVideo();
   }
 
+  /* ---------------- modo app (tela cheia) ---------------- */
+
+  function qp(k) {
+    var m = new RegExp("[?&]" + k + "=([^&#]*)").exec(location.search);
+    return m ? decodeURIComponent(m[1]) : "";
+  }
+  function isFull() {
+    return /(^|[?&])full=1/.test(location.search) || location.hash === "#app";
+  }
+  A.devSheet = function (open) {
+    var el = document.getElementById("devsheet");
+    if (!el) return;
+    if (!open) { el.innerHTML = ""; return; }
+    var roles = [["aluno", "Aluno"], ["professor", "Professor"], ["escola", "Escola"]], i, h = "";
+    for (i = 0; i < roles.length; i++) {
+      h += '<button class="btn' + (S.role === roles[i][0] ? '' : ' ghost') + ' sm" onclick="App.a.devGo(\'' + roles[i][0] + '\')">' + roles[i][1] + '</button>';
+    }
+    var list = INDEX[S.role] || INDEX.aluno, t = "";
+    for (i = 0; i < list.length; i++) {
+      t += '<button class="btn ghost sm" style="justify-content:flex-start" onclick="App.a.devScreen(\'' + list[i][0] + '\')">' + list[i][1] + '</button>';
+    }
+    el.innerHTML = '<div class="devsheet" onclick="if(event.target===this)App.a.devSheet(0)"><div class="inner">' +
+      '<p class="ex-label">Perfil</p><div class="grid">' + h + '</div>' +
+      '<p class="ex-label">Telas</p><div class="grid">' + t + '</div>' +
+      '<button class="btn ghost" onclick="App.a.devSheet(0)">Fechar</button></div></div>';
+  };
+  A.devGo = function (r) { A.devSheet(0); setRole(r); };
+  A.devScreen = function (t) { A.devSheet(0); go(t); };
+
+  function applyFull() {
+    if (!isFull()) return;
+    document.body.className = "full";
+    var r = qp("perfil"), t = qp("tela");
+    if (r && INDEX[r]) { S.role = r; S.screen = INDEX[r][0][0]; }
+    if (t) S.screen = t;
+  }
+
   A.go = go;
   A.setRole = setRole;
   A.reset = function () { clearInterval(S._t); S = seed(); render(); };
 
   window.App = { a: A, reset: function () { A.reset(); }, state: function () { return S; } };
+  applyFull();
   render();
 })();
 

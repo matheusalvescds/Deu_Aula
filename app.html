@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4F4F7">
+<title>Deu Aula</title>
+<style>
+  html,body{margin:0;height:100%;background:#3535F0;color:#fff;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    display:grid;place-items:center;text-align:center;padding:24px}
+  a{color:#fff}
+</style>
+</head>
+<body>
+<p>Abrindo o Deu Aula… <a id="l" href="index.html?full=1">tocar aqui se não abrir</a></p>
+<script>
+  // mantém os parâmetros: app.html?perfil=professor&tela=curadoria
+  var q = location.search.replace(/^\?/, "");
+  var alvo = "index.html?full=1" + (q ? "&" + q : "");
+  document.getElementById("l").href = alvo;
+  location.replace(alvo);
+</script>
+</body>
+</html>
